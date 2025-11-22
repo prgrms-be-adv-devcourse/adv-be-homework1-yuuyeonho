@@ -1,13 +1,13 @@
-package com.example.homework.entity;
+package com.example.homework.order.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
 @Entity
 @Table(name = "\"purchase_order\"", schema = "public")
 public class PurchaseOrder {
@@ -37,9 +37,34 @@ public class PurchaseOrder {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    protected PurchaseOrder(){}
 
-    public void markPaid() {
-        this.status = PurchaseOrderStatus.PAID;
+    private PurchaseOrder(UUID id, UUID productId, UUID sellerId, UUID memberId, BigDecimal amount, PurchaseOrderStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.productId = productId;
+        this.sellerId = sellerId;
+        this.memberId = memberId;
+        this.amount = amount;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public static PurchaseOrder create(UUID productId, UUID memberId){
+        return new PurchaseOrder(
+                UUID.randomUUID(),
+                productId,
+                UUID.randomUUID(),
+                memberId,
+                new BigDecimal("1000"),
+                PurchaseOrderStatus.CREATED,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+    }
+
+    public void statusChange(PurchaseOrderStatus status) {
+        this.status = status;
     }
 
     @PrePersist
